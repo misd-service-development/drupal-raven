@@ -1,8 +1,8 @@
 Raven authentication
 ====================
 
-This module allows users to log into a Drupal site using [Raven]((http://raven.cam.ac.uk/)), the University
-of Cambridge's central authentication service .
+This module allows users to log into a Drupal site using [Raven](http://raven.cam.ac.uk/),
+the University of Cambridge's central authentication service.
 
 Authors
 -------
