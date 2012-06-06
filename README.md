@@ -25,5 +25,4 @@ Is also uses code from the UcamWebauth PHP library by:
 Requirements
 ------------
 
-* Raven authentication module
-* [PHP LDAP library](http://php.net/manual/en/book.ldap.php)
+* [PHP OpenSSL library](http://www.php.net/manual/en/book.openssl.php)
