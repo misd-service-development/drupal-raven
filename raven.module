@@ -150,8 +150,6 @@ function raven_login($redirect = NULL) {
  * Get the returned details from Raven and decide whether to log in the user.
  */
 function raven_auth() {
-  global $user;
-
   // Parse Raven Reply
   list($r_ver, $r_status, $r_msg, $r_issue, $r_id, $r_url, $r_principal, $r_auth, $r_sso, $r_life, $r_params, $r_kid, $r_sig) = explode('!', $_REQUEST['WLS-Response']);
 
