@@ -18,19 +18,24 @@ function raven_settings_form($form, &$form_state) {
     '#type' => 'checkbox',
     '#title' => t('Enable Raven login override'),
     '#default_value' => variable_get('raven_login_override'),
-    '#description' => t('Override the \'@user_login_path\' and \'@user_path\' page with \'@raven_login_path\'. This means all logins must happen via Raven - site created users such as \'@user1\' will not be able to log in.<br /><i>Warning: Enabling this without having an administrator able to log in via Raven will lock you out of your site.</i><br />You can also perform this redirection with the built-in Path module.', array(
-      '@user_login_path' => USER_LOGIN_PATH,
-      '@user_path' => USER_PATH,
-      '@raven_login_path' => RAVEN_LOGIN_PATH,
-      '@user1' => $user1 ? $user1->name : 'admin',
-      // user 1 should always exist, but just in case
-    )),
+    '#description' => t('Override the normal login paths so that all logins use Raven.'),
   );
 
   $form['raven_backdoor_login'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Enable Backdoor non-Raven login'),
+    '#title' => t('Enable non-Raven backdoor login'),
     '#default_value' => variable_get('raven_backdoor_login'),
+    '#states' => array(
+      // Hide the settings when the cancel notify checkbox is disabled.
+      'invisible' => array(
+        ':input[name="raven_login_override"]' => array('checked' => FALSE),
+      ),
+    ),
+    '#description' => t('Open a hidden path (\'@raven_backdoor_login_path\') to still allow normal Drupal logins. This mean that site-created users such as \'@user1\' will still be able to log in.<br /><i>Warning: Disabling this without having an administrator able to log in with Raven will lock you out of your site.</i>', array(
+      '@raven_backdoor_login_path' => RAVEN_BACKDOOR_LOGIN_PATH,
+      // user 1 should always exist, but just in case
+      '@user1' => $user1 ? $user1->name : 'admin',
+    )),
   );
 
   // Site description for Raven Login page
