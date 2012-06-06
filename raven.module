@@ -79,16 +79,24 @@ function raven_menu() {
     'file' => 'raven.admin.inc',
   );
 
-  if (variable_get('raven_login_override') && variable_get('raven_backdoor_login')) {
-    $items[RAVEN_BACKDOOR_LOGIN_PATH] = array(
-      'title' => 'Non-Raven backdoor login',
-      'access callback' => 'user_is_anonymous',
-      'page callback' => 'raven_backdoor_login',
-      'type' => MENU_CALLBACK,
-    );
-  }
+  $items[RAVEN_BACKDOOR_LOGIN_PATH] = array(
+    'title' => 'Non-Raven backdoor login',
+    'access callback' => 'raven_backdoor_login_is_enabled',
+    'page callback' => 'raven_backdoor_login',
+    'type' => MENU_CALLBACK,
+  );
 
   return $items;
+}
+
+/**
+ * Is non-Raven backdoor login enabled?
+ *
+ * @return bool
+ *   TRUE if enable, FALSE otherwise
+ */
+function raven_backdoor_login_is_enabled() {
+  return (variable_get('raven_login_override')) == TRUE * (variable_get('raven_backdoor_login') == TRUE);
 }
 
 /**
