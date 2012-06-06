@@ -14,7 +14,7 @@ const CERTIFICATE_FILE = 'pubkey2.crt';
  * Implements hook_help().
  */
 function raven_help($path, $arg) {
-  global $base_url, $user;
+  global $user;
 
   $output = '';
 
