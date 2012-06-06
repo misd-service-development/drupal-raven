@@ -169,7 +169,7 @@ function raven_auth() {
     $r_params
   ));
 
-  if (($r_status == '200') && (check_sig($data, $r_sig) == 1)) {
+  if (($r_status == '200') && (raven_signature_check($data, $r_sig) == TRUE)) {
     // Timeout check
     if ((time() - strtotime($r_issue)) > 30) {
       drupal_set_message(t('Login attempt timed out.'), 'error');
@@ -226,35 +226,63 @@ function raven_init() {
   }
 }
 
-
-/** Functions modified from ucam_webauth.php **/
-
-function check_sig($data, $sig) {
+/**
+ * Check Raven signature.
+ *
+ * @param string $data
+ *   Data to check.
+ * @param string $sig
+ *   Signature to check against.
+ *
+ * @return bool
+ *   TRUE if successful, FALSE otherwise.
+ */
+function raven_signature_check($data, $sig) {
   $key_filename = __DIR__ . '/' . CERTIFICATE_FILE;
   $key_file = fopen($key_filename, 'r');
-  // Band-aid test for the most obvious cause of error - whole
-  // thing needs improvement
-  if (!$key_file) {
+  if ($key_file == FALSE) {
+    watchdog('raven', 'Unable to open certificate file.', array(), WATCHDOG_ERROR);
     drupal_set_message(t('Error authenticating.'), 'error');
     return FALSE;
   }
   $key_str = fread($key_file, filesize($key_filename));
   $key = openssl_pkey_get_public($key_str);
   fclose($key_file);
-  $result = openssl_verify(rawurldecode($data), wls_decode(rawurldecode($sig)), $key);
+  $result = openssl_verify(rawurldecode($data), raven_signature_decode(rawurldecode($sig)), $key);
   openssl_free_key($key);
-  return $result;
+  switch ($result) {
+    case 1:
+      return TRUE;
+      break;
+    case 0:
+      return FALSE;
+      break;
+    default:
+      watchdog('raven', 'OpenSSL error.', array(), WATCHDOG_ERROR);
+      drupal_set_message(t('Error authenticating.'), 'error');
+      return FALSE;
+      break;
+  }
 }
 
-function wls_decode($str) {
+/**
+ * Decode Raven signature.
+ *
+ * @param string $str
+ *   Signature to decode.
+ *
+ * @return string|bool
+ *   Decoded signature string on success, FALSE otherwise.
+ */
+function raven_signature_decode($str) {
   $result = preg_replace(array(
     '/-/',
     '/\./',
-    '/_/'
+    '/_/',
   ), array(
     '+',
     '/',
-    '='
+    '=',
   ), $str);
   $result = base64_decode($result);
   return $result;
