@@ -103,9 +103,18 @@ function raven_backdoor_login_is_enabled() {
  * Provides a backdoor for logging in without Raven.
  *
  * This means that site-created accounts (eg the original administrator account) can still access the site.
+ *
+ * If the user is already logged in, they are redirected to their profile page.
  */
 function raven_backdoor_login() {
-  return drupal_get_form('user_login');
+  global $user;
+  if ($user->uid) {
+    // User is already logged in
+    drupal_goto('user/' . $user->uid);
+  }
+  else {
+    return drupal_get_form('user_login');
+  }
 }
 
 /**
