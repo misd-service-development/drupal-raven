@@ -257,7 +257,7 @@ function iso2time($t) {
     -1);
 }
 
-function raven_form_user_profile_form_alter(&$form, &$form_state, $form_id) { //var_dump($form);die;
+function raven_form_user_profile_form_alter(&$form, &$form_state, $form_id) {
   // If this is a Raven user
   if (is_raven_user($form['#user'])) {
     // Change the username so that it's an unalterable CRSid
