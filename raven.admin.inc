@@ -47,13 +47,13 @@ function raven_settings_form($form, &$form_state) {
     '#description' => t('When Raven prompts the user to login it will display a message with the text <i>\'[...] This resource calls itself \'SITE DESCRIPTION\' and [...]</i>, where SITE DESCRIPTION is specified here. If left blank, the site name will be used (currently \'@sitename\').', array('@sitename' => variable_get('site_name', $base_url))),
   );
 
-  // Site redirect if user fails to login
+  // Site redirect if a login fails
   $form['raven_login_fail_redirect'] = array(
     '#type' => 'textfield',
     '#title' => t('Login failure redirect'),
     '#field_prefix' => $base_url . '/',
     '#default_value' => variable_get('raven_login_fail_redirect'),
-    '#description' => t('If a user fails login because their institution check fails, they will be redirected to the webpage above. If blank, the front page will be used.'),
+    '#description' => t('If a login fails, they will be redirected to this page.'),
     '#required' => FALSE,
   );
 
