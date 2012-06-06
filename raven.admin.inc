@@ -44,7 +44,7 @@ function raven_settings_form($form, &$form_state) {
     '#title' => t('Your website description'),
     '#default_value' => variable_get('raven_website_description'),
     // Get custom description, otherwise the site name, otherwise the site url
-    '#description' => t('When Raven prompts the user to login it will display a message with the text <i>\'[...] This resource calls itself \'SITE DESCRIPTION\' and [...]</i>, where SITE DESCRIPTION is specified here. If left blank, the site name will be used (currently \'@sitename\').', array('@sitename' => variable_get('site_name', $base_url))),
+    '#description' => t('When Raven prompts the user to log in it will display a message with the text <i>\'[...] This resource calls itself \'SITE DESCRIPTION\' and [...]</i>, where SITE DESCRIPTION is specified here. If left blank, the site name will be used (currently \'@sitename\').', array('@sitename' => variable_get('site_name', $base_url))),
   );
 
   // Site redirect if a login fails
