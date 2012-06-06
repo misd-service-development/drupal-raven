@@ -260,16 +260,6 @@ function wls_decode($str) {
   return $result;
 }
 
-function iso2time($t) {
-  return gmmktime(substr($t, 9, 2),
-    substr($t, 11, 2),
-    substr($t, 13, 2),
-    substr($t, 4, 2),
-    substr($t, 6, 2),
-    substr($t, 0, 4),
-    -1);
-}
-
 function raven_form_user_profile_form_alter(&$form, &$form_state, $form_id) {
   // If this is a Raven user
   if (is_raven_user($form['#user'])) {
