@@ -3,6 +3,8 @@
 const USER_PATH = 'user';
 const USER_LOGIN_PATH = 'user/login';
 const USER_LOGOUT_PATH = 'user/logout';
+const USER_REGISTER_PATH = 'user/register';
+const USER_PASSWORD_PATH = 'user/password';
 const RAVEN_LOGIN_PATH = 'raven/login';
 const RAVEN_AUTH_PATH = 'raven/auth';
 const RAVEN_CONFIG_PATH = 'admin/config/people/raven';
@@ -207,8 +209,19 @@ function raven_init() {
         }
         break;
       case USER_LOGIN_PATH:
-        raven_login();
-        break; // TODO user/register as well and user/password
+      case USER_REGISTER_PATH:
+        if (!$user->uid) {
+          raven_login();
+        }
+        break;
+      case USER_PASSWORD_PATH:
+        if ($user->uid) {
+          drupal_goto(USER_PATH);
+        }
+        else {
+          drupal_access_denied();
+        }
+        break;
     }
   }
 }
