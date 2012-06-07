@@ -194,8 +194,41 @@ function raven_auth() {
     drupal_goto(variable_get('raven_login_fail_redirect'));
   }
   else {
-    watchdog('raven', 'Failure: @raven_id', array('@raven_id' => $r_principal), WATCHDOG_WARNING);
+    watchdog('raven', 'Authentication failure: @message.', array('@message' => raven_response_status_name($r_status)), WATCHDOG_ERROR);
+    drupal_set_message('Raven authentication failure.', 'error');
     drupal_goto(variable_get('raven_login_fail_redirect'));
+  }
+}
+
+/**
+ * Get Raven response status name.
+ *
+ * @param int $code
+ *   Response status code.
+ *
+ * @return string
+ *   Response status name.
+ */
+function raven_response_status_name($code) {
+  switch ($code) {
+    case 200:
+      return 'Successful authentication';
+    case 410:
+      return 'The user cancelled the authentication request';
+    case 510:
+      return 'No mutually acceptable authentication types available';
+    case 520:
+      return 'Unsupported protocol version';
+    case 530:
+      return 'General request parameter error';
+    case 540:
+      return 'Interaction would be required';
+    case 560:
+      return 'WAA not authorised';
+    case 570:
+      return 'Authentication declined';
+    default:
+      return 'Unknown status code';
   }
 }
 
