@@ -190,12 +190,12 @@ function raven_auth() {
   }
   elseif ($r_status == '410') {
     watchdog('raven', 'Raven authentication cancelled.', NULL, WATCHDOG_INFO);
-    drupal_set_message('Raven authentication cancelled.');
+    drupal_set_message(t('Raven authentication cancelled.'));
     drupal_goto(variable_get('raven_login_fail_redirect'));
   }
   else {
     watchdog('raven', 'Authentication failure: @message.', array('@message' => raven_response_status_name($r_status)), WATCHDOG_ERROR);
-    drupal_set_message('Raven authentication failure.', 'error');
+    drupal_set_message(t('Raven authentication failure.'), 'error');
     drupal_goto(variable_get('raven_login_fail_redirect'));
   }
 }
