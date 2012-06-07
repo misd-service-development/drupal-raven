@@ -188,6 +188,11 @@ function raven_auth() {
     user_raven_login_register($r_principal);
     drupal_goto(urldecode($r_params));
   }
+  elseif ($r_status == '410') {
+    watchdog('raven', 'Raven authentication cancelled.', NULL, WATCHDOG_INFO);
+    drupal_set_message('Raven authentication cancelled.');
+    drupal_goto(variable_get('raven_login_fail_redirect'));
+  }
   else {
     watchdog('raven', 'Failure: @raven_id', array('@raven_id' => $r_principal), WATCHDOG_WARNING);
     drupal_goto(variable_get('raven_login_fail_redirect'));
