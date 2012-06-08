@@ -430,16 +430,22 @@ function user_raven_login_register($name) {
     drupal_alter('raven_login', $edit, $account);
   }
 
-  $account = user_save($account, $edit);
-
-  if ($account != FALSE) {
-    user_set_authmaps($account, array('authname_raven' => $name));
-
-    // Log user in
-    $form_state['uid'] = $account->uid;
-    user_login_submit(array(), $form_state);
+  // Check if user is blocked
+  if (user_is_blocked($account->name)) {
+    drupal_set_message(t('The username @name is blocked.', array('@name' => $account->name)), 'error');
   }
   else {
-    drupal_set_message(t('Error saving user account.'), 'error');
+    // Save the account
+    $account = user_save($account, $edit);
+    if ($account != FALSE) {
+      user_set_authmaps($account, array('authname_raven' => $name));
+
+      // Log user in
+      $form_state['uid'] = $account->uid;
+      user_login_submit(array(), $form_state);
+    }
+    else {
+      drupal_set_message(t('Error saving user account.'), 'error');
+    }
   }
 }
