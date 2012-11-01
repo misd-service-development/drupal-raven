@@ -109,7 +109,7 @@ function raven_permission() {
  *   TRUE if enable, FALSE otherwise
  */
 function raven_backdoor_login_is_enabled() {
-  return (variable_get('raven_login_override')) == TRUE * (variable_get('raven_backdoor_login') == TRUE);
+  return (variable_get('raven_login_override')) === TRUE * (variable_get('raven_backdoor_login') === TRUE);
 }
 
 /**
@@ -139,7 +139,7 @@ function raven_backdoor_login() {
 function raven_login($redirect = NULL) {
   global $base_url;
 
-  if ($redirect == NULL) {
+  if ($redirect === NULL) {
     $redirect = ($_SERVER['HTTP_REFERER'] != NULL ? $_SERVER['HTTP_REFERER'] : $base_url);
   }
 
@@ -180,7 +180,7 @@ function raven_auth() {
     $r_params
   ));
 
-  if (($r_status == '200') && (raven_signature_check($data, $r_sig) == TRUE)) {
+  if (($r_status === '200') && (raven_signature_check($data, $r_sig) === TRUE)) {
     // Timeout check
     if ((time() - strtotime($r_issue)) > 30) {
       drupal_set_message(t('Login attempt timed out.'), 'error');
@@ -199,7 +199,7 @@ function raven_auth() {
     user_raven_login_register($r_principal);
     drupal_goto(urldecode($r_params));
   }
-  elseif ($r_status == '410') {
+  elseif ($r_status === '410') {
     watchdog('raven', 'Raven authentication cancelled.', NULL, WATCHDOG_INFO);
     drupal_set_message(t('Raven authentication cancelled.'));
     drupal_goto(variable_get('raven_login_fail_redirect'));
@@ -289,7 +289,7 @@ function raven_init() {
 function raven_signature_check($data, $sig) {
   $key_filename = __DIR__ . '/' . CERTIFICATE_FILE;
   $key_file = fopen($key_filename, 'r');
-  if ($key_file == FALSE) {
+  if ($key_file === FALSE) {
     watchdog('raven', 'Unable to open certificate file.', array(), WATCHDOG_ERROR);
     drupal_set_message(t('Error authenticating.'), 'error');
     return FALSE;
@@ -365,7 +365,7 @@ function raven_form_user_profile_form_alter(&$form, &$form_state, $form_id) {
  *   TRUE if is a Raven user, FALSE if not.
  */
 function is_raven_user(StdClass $account) {
-  if (isset($account->is_raven_user) == FALSE) {
+  if (isset($account->is_raven_user) === FALSE) {
     $authmaps = user_get_authmaps($account->name);
     $account->is_raven_user = isset($authmaps['raven']);
   }
@@ -391,10 +391,10 @@ function user_raven_login_register($name) {
   $edit = array();
   $account = user_external_load($name);
 
-  if ($account == FALSE) {
+  if ($account === FALSE) {
     // User hasn't logged in with Raven before
     $account = user_load_by_name($name);
-    if ($account == FALSE) {
+    if ($account === FALSE) {
       // User does not exist yet
       $account = drupal_anonymous_user();
       $account->is_raven_user = TRUE;
