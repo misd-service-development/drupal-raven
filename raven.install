@@ -32,6 +32,7 @@ function raven_install() {
   variable_set('raven_backdoor_login', TRUE);
   variable_set('raven_website_description', NULL);
   variable_set('raven_login_fail_redirect', NULL);
+  variable_set('raven_logout_on_browser_close', TRUE);
 }
 
 /**
@@ -43,6 +44,7 @@ function raven_uninstall() {
   variable_del('raven_backdoor_login');
   variable_del('raven_website_description');
   variable_del('raven_login_fail_redirect');
+  variable_del('raven_logout_on_browser_close');
 
   // Delete authmap entries
   db_delete('authmap')

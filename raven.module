@@ -391,6 +391,10 @@ function user_raven_login_register($name) {
   $edit = array();
   $account = user_external_load($name);
 
+  if (variable_get('raven_logout_on_browser_close') === TRUE) {
+    ini_set('session.cookie_lifetime', 0);
+  }
+
   if ($account === FALSE) {
     // User hasn't logged in with Raven before
     $account = user_load_by_name($name);

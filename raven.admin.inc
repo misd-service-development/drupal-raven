@@ -38,6 +38,14 @@ function raven_settings_form($form, &$form_state) {
     )),
   );
 
+  // Log users out when closing the browser?
+  $form['raven_logout_on_browser_close'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Log out Raven users when closing the browser'),
+    '#default_value' => variable_get('raven_logout_on_browser_close'),
+    '#description' => t('Drupal, by default, does not log the user out when closing the browser (the session is kept active for over 23 days). Raven applications, however, are usually expected to do so. This option logs out users who have logged in through Raven when the browser is closed.<br /><i>Note: Enabling this will not affect existing sessions, users will need to log out manually first.</i>'),
+  );
+
   // Site description for Raven Login page
   $form['raven_website_description'] = array(
     '#type' => 'textfield',
