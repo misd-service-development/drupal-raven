@@ -154,7 +154,7 @@ function raven_login($redirect = NULL) {
   }
   $parameters = implode('&', $parameters);
 
-  drupal_goto('https://raven.cam.ac.uk/auth/authenticate.html?' . $parameters);
+  drupal_goto('https://raven.cam.ac.uk/auth/authenticate.html?' . $parameters, array(), 303);
 }
 
 /**
