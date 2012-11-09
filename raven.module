@@ -109,7 +109,7 @@ function raven_permission() {
  *   TRUE if enable, FALSE otherwise
  */
 function raven_backdoor_login_is_enabled() {
-  return (variable_get('raven_login_override')) === TRUE * (variable_get('raven_backdoor_login') === TRUE);
+  return (variable_get('raven_login_override')) == TRUE * (variable_get('raven_backdoor_login') == TRUE);
 }
 
 /**
