@@ -103,6 +103,24 @@ function raven_permission() {
 }
 
 /**
+ * Implements hook_menu_site_status_alter().
+ *
+ * Makes the Raven login pages available if the site is in maintenance mode.
+ */
+function raven_menu_site_status_alter(&$menu_site_status, $path) {
+  if (
+    $menu_site_status === MENU_SITE_OFFLINE &&
+    user_is_anonymous() && (
+      $path === RAVEN_LOGIN_PATH ||
+      $path === RAVEN_AUTH_PATH ||
+      ($path === RAVEN_BACKDOOR_LOGIN_PATH && raven_backdoor_login_is_enabled())
+    )
+  ) {
+    $menu_site_status = MENU_SITE_ONLINE;
+  }
+}
+
+/**
  * Is non-Raven backdoor login enabled?
  *
  * @return bool
