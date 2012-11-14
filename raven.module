@@ -121,13 +121,13 @@ function raven_backdoor_login_is_enabled() {
  */
 function raven_backdoor_login() {
   global $user;
+
   if ($user->uid) {
     // User is already logged in
     drupal_goto('user/' . $user->uid);
   }
-  else {
-    return drupal_get_form('user_login');
-  }
+
+  return drupal_get_form('user_login');
 }
 
 /**
