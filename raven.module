@@ -10,7 +10,8 @@ const RAVEN_AUTH_PATH = 'raven/auth';
 const RAVEN_CONFIG_PATH = 'admin/config/people/raven';
 const RAVEN_HELP_PATH = 'admin/help#raven';
 const RAVEN_BACKDOOR_LOGIN_PATH = 'user/backdoor/login';
-const CERTIFICATE_FILE = 'pubkey2.crt';
+const RAVEN_CERTIFICATE_FILE = 'pubkey2.crt';
+const RAVEN_KID = '2';
 
 /**
  * Implements hook_help().
@@ -182,7 +183,15 @@ function raven_login($redirect = NULL) {
  */
 function raven_auth() {
   // Parse Raven Reply
-  list($r_ver, $r_status, $r_msg, $r_issue, $r_id, $r_url, $r_principal, $r_auth, $r_sso, $r_life, $r_params, $r_kid, $r_sig) = explode('!', $_REQUEST['WLS-Response']);
+  $parts = explode('!', $_REQUEST['WLS-Response']);
+
+  if (count($parts) <> 13) {
+    drupal_set_message(t('Suspicious login attempt denied and logged.'), 'error');
+    watchdog('raven', 'Suspicious login attempt. Raven response is not acceptable (@wls_response).', array('@wls_response' => $_REQUEST['WLS-Response']), WATCHDOG_ALERT);
+    drupal_goto(variable_get('raven_login_fail_redirect'));
+  }
+
+  list($r_ver, $r_status, $r_msg, $r_issue, $r_id, $r_url, $r_principal, $r_auth, $r_sso, $r_life, $r_params, $r_kid, $r_sig) = $parts;
 
   $data = implode('!', array(
     $r_ver,
@@ -206,10 +215,47 @@ function raven_auth() {
       drupal_goto(variable_get('raven_login_fail_redirect'));
     }
 
-    // Valid path check
-    if ($r_url != url(RAVEN_AUTH_PATH, array('absolute' => TRUE))) {
+    // 'kid' check
+    if ($r_kid !== RAVEN_KID) {
       drupal_set_message(t('Suspicious login attempt denied and logged.'), 'error');
-      watchdog('raven', 'Suspicious login attempt claiming to be @raven_id. Path validation failed. The \'Location\' URL may contain the source of this attempted intrusion.', array('@raven_id' => $r_principal), WATCHDOG_ALERT);
+      watchdog('raven', 'Suspicious login attempt claiming to be @raven_id. \'kid\' validation failed: expecting \'@expected\', got \'@given\'.', array(
+        '@raven_id' => $r_principal,
+        '@expected' => RAVEN_KID,
+        '@given' => $r_kid,
+      ), WATCHDOG_ALERT);
+      drupal_goto(variable_get('raven_login_fail_redirect'));
+    }
+
+    // Valid path check
+    if ($r_url !== url(RAVEN_AUTH_PATH, array('absolute' => TRUE))) {
+      drupal_set_message(t('Suspicious login attempt denied and logged.'), 'error');
+      watchdog('raven', 'Suspicious login attempt claiming to be @raven_id. \'url\' validation failed: expecting \'@expected\', got \'@given\'.', array(
+        '@raven_id' => $r_principal,
+        '@expected' => url(RAVEN_AUTH_PATH, array('absolute' => TRUE)),
+        '@given' => $r_url,
+      ), WATCHDOG_ALERT);
+      drupal_goto(variable_get('raven_login_fail_redirect'));
+    }
+
+    // 'auth' check
+    if ($r_auth !== 'pwd' && $r_auth !== '') {
+      drupal_set_message(t('Suspicious login attempt denied and logged.'), 'error');
+      watchdog('raven', 'Suspicious login attempt claiming to be @raven_id. \'auth\' validation failed: expecting \'@expected\', got \'@given\'.', array(
+        '@raven_id' => $r_principal,
+        '@expected' => 'pwd',
+        '@given' => $r_auth,
+      ), WATCHDOG_ALERT);
+      drupal_goto(variable_get('raven_login_fail_redirect'));
+    }
+
+    // 'sso' check
+    if ($r_sso !== 'pwd' && $r_auth === '') {
+      drupal_set_message(t('Suspicious login attempt denied and logged.'), 'error');
+      watchdog('raven', 'Suspicious login attempt claiming to be @raven_id. \'sso\' validation failed: expecting \'@expected\', got \'@given\'.', array(
+        '@raven_id' => $r_principal,
+        '@expected' => 'pwd',
+        '@given' => $r_sso,
+      ), WATCHDOG_ALERT);
       drupal_goto(variable_get('raven_login_fail_redirect'));
     }
 
@@ -305,7 +351,7 @@ function raven_init() {
  *   TRUE if successful, FALSE otherwise.
  */
 function raven_signature_check($data, $sig) {
-  $key_filename = __DIR__ . '/' . CERTIFICATE_FILE;
+  $key_filename = __DIR__ . '/' . RAVEN_CERTIFICATE_FILE;
   $key_file = fopen($key_filename, 'r');
   if ($key_file === FALSE) {
     watchdog('raven', 'Unable to open certificate file.', array(), WATCHDOG_ERROR);
