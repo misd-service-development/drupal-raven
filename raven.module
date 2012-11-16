@@ -127,7 +127,7 @@ function raven_menu_site_status_alter(&$menu_site_status, $path) {
  *   TRUE if enable, FALSE otherwise
  */
 function raven_backdoor_login_is_enabled() {
-  return (variable_get('raven_login_override')) == TRUE * (variable_get('raven_backdoor_login') == TRUE);
+  return (variable_get('raven_login_override') == TRUE) * (variable_get('raven_backdoor_login') == TRUE);
 }
 
 /**
