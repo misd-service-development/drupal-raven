@@ -62,7 +62,7 @@ function raven_menu() {
     'title' => 'Raven log in',
     'access callback' => 'user_is_anonymous',
     'page callback' => 'raven_login',
-    'weight' => 10,
+    'type' => MENU_CALLBACK,
   );
 
   $items[RAVEN_AUTH_PATH] = array(
@@ -370,6 +370,38 @@ function raven_form_user_profile_form_alter(&$form, &$form_state, $form_id) {
     if (isset($form['account']['current_pass'])) {
       $form['account']['current_pass']['#access'] = FALSE;
     }
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function raven_form_alter(&$form, $form_state, $form_id) {
+  switch ($form_id) {
+    case 'user_login':
+    case 'user_register_form':
+      if (current_path() !== RAVEN_BACKDOOR_LOGIN_PATH) {
+        $form['raven_message'] = array(
+          '#markup' => '<div class="messages">' . t('Have a Raven account? You can <a href="@raven_login_path">log in with Raven</a> instead.', array('@raven_login_path' => url(RAVEN_LOGIN_PATH))) . '</div>',
+          '#weight' => -100,
+        );
+      }
+      break;
+    case 'user_login_block':
+      $form['raven_message'] = array(
+        '#markup' => '<p>' . t('Have a Raven account? You can <a href="@raven_login_path">log in with Raven</a> instead.', array('@raven_login_path' => url(RAVEN_LOGIN_PATH))) . '</p>',
+        '#weight' => -100,
+      );
+      break;
+  }
+}
+
+/**
+ * Implements hook_block_view_alter().
+ */
+function raven_block_view_alter(&$data, $block) {
+  if ($block->delta === 'login' && variable_get('raven_login_override') == TRUE) {
+    $data['content'] = '<ul><li>' . t('<a href="@raven_login_path">Log in with Raven</a>', array('@raven_login_path' => url(RAVEN_LOGIN_PATH))) . '</li></ul>';
   }
 }
 
