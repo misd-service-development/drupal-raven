@@ -33,15 +33,15 @@ function raven_help($path, $arg) {
       $output .= '<dl>';
 
       $output .= '<dt>' . t('Creating Raven users') . '</dt>';
-      $output .= '<dd>' . t('Users who log in with Raven create a new account automatically if one does not already exist.') . '</dd>';
+      $output .= '<dd>' . t('Users who log in with Raven create a new account automatically if one does not already exist, assuming your site allows visitors to create accounts.') . '</dd>';
 
       $output .= '<dt>' . t('Editing Raven users') . '</dt>';
       $output .= '<dd>' . t('On the <a href="@user_edit_path">user edit page</a> the username field is replaced with a disabled CRSid field for users who have logged in with Raven. The password area is also hidden.', array('@user_edit_path' => url('user/' . $user->uid . '/edit'))) . '</dd>';
 
       $user1 = user_load(1);
       $output .= '<dt>' . t('Disable non-Raven users') . '</dt>';
-      $output .= '<dd>' . t('The standard user login paths can be overridden in the <a href="@raven_config_path">Raven administration page</a>, so all logins must happen via Raven.', array('@raven_config_path' => url(RAVEN_CONFIG_PATH))) . '</dd>';
-      $output .= '<dd>' . t('Site-created users such as \'@user1\' will not be able to log in. <i>Enabling this without having an administrator able to log in via Raven will lock you out of your site.</i>', array(
+      $output .= '<dd>' . t('The standard user login paths can be overridden in the <a href="@raven_config_path">Raven administration page</a>, so all users must log in using Raven.', array('@raven_config_path' => url(RAVEN_CONFIG_PATH))) . '</dd>';
+      $output .= '<dd>' . t('Site-created users such as \'@user1\' will not be able to log in, unless the backdoor login path is enabled. <i>Disabling this without having an administrator able to log in via Raven will lock you out of your site.</i>', array(
         '@user1' => $user1 ? $user1->name : 'admin',
         // user 1 should always exist, but just in case
       )) . '</dd>';

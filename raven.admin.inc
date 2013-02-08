@@ -18,7 +18,7 @@ function raven_settings_form($form, &$form_state) {
     '#type' => 'checkbox',
     '#title' => t('Enable Raven login override'),
     '#default_value' => variable_get('raven_login_override'),
-    '#description' => t('Override the normal login paths so that all logins use Raven.'),
+    '#description' => t('Override the normal login paths so that users can only log in using Raven.'),
   );
 
   $form['raven_backdoor_login'] = array(

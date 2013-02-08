@@ -3,7 +3,7 @@ Raven authentication
 
 This module allows users to log into a Drupal site using [Raven](http://raven.cam.ac.uk/), the University of Cambridge's central authentication service.
 
-Users can log into an existing account assuming their CRSid has been used as their username, otherwise a new account is created.
+Users can log into an existing account assuming their CRSid has been used as their username, otherwise a new account is created (if your site allows visitors to create accounts).
 
 Authors
 -------
@@ -16,3 +16,4 @@ Requirements
 ------------
 
 * [PHP OpenSSL library](http://www.php.net/manual/en/book.openssl.php)
+* Drupal 7
