@@ -426,7 +426,7 @@ function raven_form_alter(&$form, $form_state, $form_id) {
   switch ($form_id) {
     case 'user_login':
     case 'user_register_form':
-      if (current_path() !== RAVEN_BACKDOOR_LOGIN_PATH) {
+      if (current_path() !== RAVEN_BACKDOOR_LOGIN_PATH && strncmp(current_path(), 'admin', 5)) {
         $form['raven_message'] = array(
           '#markup' => '<div class="messages">' . t('Have a Raven account? You can <a href="@raven_login_path">log in with Raven</a> instead.', array('@raven_login_path' => url(RAVEN_LOGIN_PATH))) . '</div>',
           '#weight' => -100,
