@@ -177,9 +177,11 @@ function raven_login($redirect = NULL) {
 }
 
 /**
- * Main authentication function
+ * Main authentication function.
  *
  * Get the returned details from Raven and decide whether to log in the user.
+ *
+ * Failed attempts send the user to the login failure redirect path and logs the problem.
  */
 function raven_auth() {
   // Parse Raven Reply
@@ -401,6 +403,11 @@ function raven_signature_decode($str) {
   return $result;
 }
 
+/**
+ * Implements hook_form_FORM_ID_alter() for user_profile_form().
+ *
+ * Changes the user profile from for Raven users (eg the username field is labelled as CRSid).
+ */
 function raven_form_user_profile_form_alter(&$form, &$form_state, $form_id) {
   // If this is a Raven user
   if (is_raven_user($form['#user'])) {
@@ -421,6 +428,8 @@ function raven_form_user_profile_form_alter(&$form, &$form_state, $form_id) {
 
 /**
  * Implements hook_form_alter().
+ *
+ * Adds a 'log in with Raven' link to relevant pages.
  */
 function raven_form_alter(&$form, $form_state, $form_id) {
   switch ($form_id) {
@@ -467,7 +476,6 @@ function is_raven_user(StdClass $account) {
   }
   return $account->is_raven_user;
 }
-
 
 /**
  * Logs in or register the user following Raven authentication.
