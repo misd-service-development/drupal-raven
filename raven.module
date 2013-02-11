@@ -482,8 +482,6 @@ function is_raven_user(StdClass $account) {
  *
  * The global $user object is populated and login tasks are performed.
  *
- * This replaces user_raven_login_register() which can't handle accounts already existing.
- *
  * @param string $name
  *   Username, which is the CRSid.
  *
