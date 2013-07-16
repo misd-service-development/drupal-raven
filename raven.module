@@ -455,6 +455,12 @@ function raven_form_alter(&$form, $form_state, $form_id) {
  * Implements hook_block_view_alter().
  */
 function raven_block_view_alter(&$data, $block) {
+  global $user;
+
+  if ($user->uid) {
+    return;
+  }
+
   if ($block->delta === 'login' && variable_get('raven_login_override') == TRUE) {
     $data['content'] = '<ul><li>' . t('<a href="@raven_login_path">Log in with Raven</a>', array('@raven_login_path' => url(RAVEN_LOGIN_PATH))) . '</li></ul>';
   }
