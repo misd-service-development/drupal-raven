@@ -557,7 +557,6 @@ function user_raven_login_register($name) {
   // Check if user is blocked
   if (isset($account->name) && user_is_blocked($account->name)) {
     drupal_set_message(t('The username @name is blocked.', array('@name' => $account->name)), 'error');
-    drupal_goto(variable_get('raven_login_fail_redirect'));
   }
   else {
     // Save the account
@@ -572,5 +571,11 @@ function user_raven_login_register($name) {
     else {
       drupal_set_message(t('Error saving user account.'), 'error');
     }
+  }
+
+  global $user;
+
+  if (!$user->uid) {
+    drupal_goto(variable_get('raven_login_fail_redirect'));
   }
 }
