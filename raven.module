@@ -455,12 +455,6 @@ function raven_form_alter(&$form, $form_state, $form_id) {
  * Implements hook_block_view_alter().
  */
 function raven_block_view_alter(&$data, $block) {
-  global $user;
-
-  if ($user->uid) {
-    return;
-  }
-
   if ($block->delta === 'login' && variable_get('raven_login_override') == TRUE) {
     $data['content'] = '<ul><li>' . t('<a href="@raven_login_path">Log in with Raven</a>', array('@raven_login_path' => url(RAVEN_LOGIN_PATH))) . '</li></ul>';
   }
@@ -505,21 +499,31 @@ function user_raven_login_register($name) {
 
   if ($account === FALSE) {
     // User hasn't logged in with Raven before
+		
     $account = user_load_by_name($name);
     if ($account === FALSE) {
-      // User does not exist yet
-      switch (variable_get('user_register')) {
-        case USER_REGISTER_ADMINISTRATORS_ONLY:
-          drupal_set_message(t('Only site administrators can create accounts.'), 'error');
-          return;
-        case USER_REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL:
-          drupal_set_message(t('Thank you for applying for an account. Your account is currently pending approval by the site administrator.'));
-          $status = 0;
-          break;
-        default:
-          $status = 1;
-          break;
-      }
+      	 // User does not exist yet
+	  
+	  	 // check if overriding admin approval is set
+	  if(variable_get('raven_override_administrator_approval')){
+		   $status = 1;
+	  } else {	  
+	  
+		  switch (variable_get('user_register')) {
+			case USER_REGISTER_ADMINISTRATORS_ONLY:
+			  drupal_set_message(t('Only site administrators can create accounts.'), 'error');
+			  return;
+			case USER_REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL:
+			  drupal_set_message(t('Thank you for applying for an account. Your account is currently pending approval by the site administrator.'));
+			  $status = 0;
+			  break;
+			default:
+			  $status = 1;
+			  break;
+		  }
+	  
+	  }
+	  
       $account = drupal_anonymous_user();
       $account->is_raven_user = TRUE;
       $edit = array(
@@ -548,8 +552,7 @@ function user_raven_login_register($name) {
         l(t('edit'), 'user/' . $account->uid . '/edit')
       ));
     }
-  }
-  else {
+  }  else {
     $account->is_raven_user = TRUE;
     drupal_alter('raven_login', $edit, $account);
   }
@@ -571,11 +574,5 @@ function user_raven_login_register($name) {
     else {
       drupal_set_message(t('Error saving user account.'), 'error');
     }
-  }
-
-  global $user;
-
-  if (!$user->uid) {
-    drupal_goto(variable_get('raven_login_fail_redirect'));
   }
 }
