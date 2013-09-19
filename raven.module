@@ -455,7 +455,14 @@ function raven_form_alter(&$form, $form_state, $form_id) {
  * Implements hook_block_view_alter().
  */
 function raven_block_view_alter(&$data, $block) {
-  if ($block->delta === 'login' && variable_get('raven_login_override') == TRUE) {
+	
+	global $user;
+
+	if ($user->uid) {
+		return;
+	}
+  
+	if ($block->delta === 'login' && variable_get('raven_login_override') == TRUE) {
     $data['content'] = '<ul><li>' . t('<a href="@raven_login_path">Log in with Raven</a>', array('@raven_login_path' => url(RAVEN_LOGIN_PATH))) . '</li></ul>';
   }
 }
@@ -574,5 +581,11 @@ function user_raven_login_register($name) {
     else {
       drupal_set_message(t('Error saving user account.'), 'error');
     }
+  }
+  
+   global $user;
+
+  if (!$user->uid) {
+   drupal_goto(variable_get('raven_login_fail_redirect'));
   }
 }
