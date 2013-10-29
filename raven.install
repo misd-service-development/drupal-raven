@@ -33,7 +33,7 @@ function raven_install() {
   variable_set('raven_website_description', NULL);
   variable_set('raven_login_fail_redirect', NULL);
   variable_set('raven_logout_on_browser_close', TRUE);
-  variable_set('raven_override_administrator_approval', TRUE);
+  variable_set('raven_override_administrator_approval', FALSE);
 }
 
 /**
@@ -46,7 +46,7 @@ function raven_uninstall() {
   variable_del('raven_website_description');
   variable_del('raven_login_fail_redirect');
   variable_del('raven_logout_on_browser_close');
-  variable_set('raven_override_administrator_approval');
+  variable_del('raven_override_administrator_approval');
 
   // Delete authmap entries
   db_delete('authmap')

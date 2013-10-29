@@ -43,7 +43,7 @@ function raven_settings_form($form, &$form_state) {
     '#type' => 'checkbox',
     '#title' => t('Enable administrator approval override'),
     '#default_value' => variable_get('raven_override_administrator_approval'),
-    '#description' => t('Override the Drupal administrator approval settings for users succesfully authenticated by Raven.'),
+    '#description' => t('Override the Drupal administrator approval settings for users successfully authenticated by Raven.'),
   );
 
   // Log users out when closing the browser?
