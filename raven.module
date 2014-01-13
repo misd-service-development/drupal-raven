@@ -516,7 +516,8 @@ function user_raven_login_register($name) {
         switch (variable_get('user_register')) {
           case USER_REGISTER_ADMINISTRATORS_ONLY:
             drupal_set_message(t('Only site administrators can create accounts.'), 'error');
-            return;
+            drupal_goto(variable_get('raven_login_fail_redirect'));
+            break;
           case USER_REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL:
             drupal_set_message(t('Thank you for applying for an account. Your account is currently pending approval by the site administrator.'));
             $status = 0;
