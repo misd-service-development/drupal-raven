@@ -1,18 +1,5 @@
 <?php
 
-const USER_PATH = 'user';
-const USER_LOGIN_PATH = 'user/login';
-const USER_LOGOUT_PATH = 'user/logout';
-const USER_REGISTER_PATH = 'user/register';
-const USER_PASSWORD_PATH = 'user/password';
-const RAVEN_LOGIN_PATH = 'raven/login';
-const RAVEN_AUTH_PATH = 'raven/auth';
-const RAVEN_CONFIG_PATH = 'admin/config/people/raven';
-const RAVEN_HELP_PATH = 'admin/help#raven';
-const RAVEN_BACKDOOR_LOGIN_PATH = 'user/backdoor/login';
-const RAVEN_CERTIFICATE_FILE = 'pubkey2.crt';
-const RAVEN_KID = '2';
-
 /**
  * Implements hook_help().
  */
@@ -22,10 +9,10 @@ function raven_help($path, $arg) {
   $output = '';
 
   switch ($path) {
-    case RAVEN_CONFIG_PATH:
+    case 'admin/config/people/raven':
       $output .= '<p>' . t('Raven users are able to log in to the site. If an account does not already exist, one is created.') . '</p>';
       break;
-    case RAVEN_HELP_PATH:
+    case 'admin/help#raven':
       $output .= '<h3>' . t('About') . '</h3>';
       $output .= '<p>' . t('The Raven authentication module allows users to log in using <a href="@raven_url">Raven</a>, the University of Cambridge\'s central web authentication service. It can replace, or co-exist with, the standard Drupal authentication method.', array('@raven_url' => 'http://raven.cam.ac.uk/')) . '</p>';
 
@@ -40,7 +27,7 @@ function raven_help($path, $arg) {
 
       $user1 = user_load(1);
       $output .= '<dt>' . t('Disable non-Raven users') . '</dt>';
-      $output .= '<dd>' . t('The standard user login paths can be overridden in the <a href="@raven_config_path">Raven administration page</a>, so all users must log in using Raven.', array('@raven_config_path' => url(RAVEN_CONFIG_PATH))) . '</dd>';
+      $output .= '<dd>' . t('The standard user login paths can be overridden in the <a href="@raven_config_path">Raven administration page</a>, so all users must log in using Raven.', array('@raven_config_path' => url('admin/config/people/raven'))) . '</dd>';
       $output .= '<dd>' . t('Site-created users such as \'@user1\' will not be able to log in, unless the backdoor login path is enabled. <i>Disabling this without having an administrator able to log in via Raven will lock you out of your site.</i>', array(
         '@user1' => $user1 ? $user1->name : 'admin',
         // user 1 should always exist, but just in case
@@ -59,21 +46,21 @@ function raven_help($path, $arg) {
 function raven_menu() {
   $items = array();
 
-  $items[RAVEN_LOGIN_PATH] = array(
+  $items['raven/login'] = array(
     'title' => 'Raven log in',
     'access callback' => 'user_is_anonymous',
     'page callback' => 'raven_login',
     'type' => MENU_CALLBACK,
   );
 
-  $items[RAVEN_AUTH_PATH] = array(
+  $items['raven/auth'] = array(
     'title' => 'Raven authentication',
     'access callback' => TRUE,
     'page callback' => 'raven_auth',
     'type' => MENU_CALLBACK,
   );
 
-  $items[RAVEN_CONFIG_PATH] = array(
+  $items['admin/config/people/raven'] = array(
     'title' => 'Raven authentication',
     'description' => 'Settings to configure logging in with Raven',
     'page callback' => 'drupal_get_form',
@@ -82,7 +69,7 @@ function raven_menu() {
     'file' => 'raven.admin.inc',
   );
 
-  $items[RAVEN_BACKDOOR_LOGIN_PATH] = array(
+  $items['user/backdoor/login'] = array(
     'title' => 'Non-Raven backdoor login',
     'access callback' => 'raven_backdoor_login_is_enabled',
     'page callback' => 'raven_backdoor_login',
@@ -112,9 +99,9 @@ function raven_menu_site_status_alter(&$menu_site_status, $path) {
   if (
     $menu_site_status === MENU_SITE_OFFLINE &&
     user_is_anonymous() && (
-      $path === RAVEN_LOGIN_PATH ||
-      $path === RAVEN_AUTH_PATH ||
-      ($path === RAVEN_BACKDOOR_LOGIN_PATH && raven_backdoor_login_is_enabled())
+      $path === 'raven/login' ||
+      $path === 'raven/auth' ||
+      ($path === 'user/backdoor/login' && raven_backdoor_login_is_enabled())
     )
   ) {
     $menu_site_status = MENU_SITE_ONLINE;
@@ -163,7 +150,7 @@ function raven_login($redirect = NULL) {
   }
 
   $params['ver'] = '2';
-  $params['url'] = url(RAVEN_AUTH_PATH, array('absolute' => TRUE));
+  $params['url'] = url('raven/auth', array('absolute' => TRUE));
   $params['desc'] = variable_get('raven_website_description', variable_get('site_name', $base_url));
   $params['params'] = urlencode(url($redirect, array('absolute' => TRUE)));
 
@@ -218,22 +205,22 @@ function raven_auth() {
     }
 
     // 'kid' check
-    if ($r_kid !== RAVEN_KID) {
+    if ($r_kid !== '2') {
       drupal_set_message(t('Suspicious login attempt denied and logged.'), 'error');
       watchdog('raven', 'Suspicious login attempt claiming to be @raven_id. \'kid\' validation failed: expecting \'@expected\', got \'@given\'.', array(
         '@raven_id' => $r_principal,
-        '@expected' => RAVEN_KID,
+        '@expected' => '2',
         '@given' => $r_kid,
       ), WATCHDOG_ALERT);
       drupal_goto(variable_get('raven_login_fail_redirect'));
     }
 
     // Valid path check
-    if ($r_url !== url(RAVEN_AUTH_PATH, array('absolute' => TRUE))) {
+    if ($r_url !== url('raven/auth', array('absolute' => TRUE))) {
       drupal_set_message(t('Suspicious login attempt denied and logged.'), 'error');
       watchdog('raven', 'Suspicious login attempt claiming to be @raven_id. \'url\' validation failed: expecting \'@expected\', got \'@given\'.', array(
         '@raven_id' => $r_principal,
-        '@expected' => url(RAVEN_AUTH_PATH, array('absolute' => TRUE)),
+        '@expected' => url('raven/auth', array('absolute' => TRUE)),
         '@given' => $r_url,
       ), WATCHDOG_ALERT);
       drupal_goto(variable_get('raven_login_fail_redirect'));
@@ -318,20 +305,20 @@ function raven_init() {
   // prevent normal login pages if needed
   if (variable_get('raven_login_override', FALSE)) {
     switch (strtolower(request_path())) {
-      case USER_PATH:
+      case 'user':
         if (!$user->uid) {
-          raven_login(USER_PATH);
+          raven_login('user');
         }
         break;
-      case USER_LOGIN_PATH:
-      case USER_REGISTER_PATH:
+      case 'user/login':
+      case 'user/register':
         if (!$user->uid) {
           raven_login();
         }
         break;
-      case USER_PASSWORD_PATH:
+      case 'user/password':
         if ($user->uid) {
-          drupal_goto(USER_PATH);
+          drupal_goto('user');
         }
         else {
           drupal_access_denied();
@@ -353,7 +340,7 @@ function raven_init() {
  *   TRUE if successful, FALSE otherwise.
  */
 function raven_signature_check($data, $sig) {
-  $key_filename = __DIR__ . '/' . RAVEN_CERTIFICATE_FILE;
+  $key_filename = dirname(__FILE__) . '/pubkey2.crt';
   $key_file = fopen($key_filename, 'r');
   if ($key_file === FALSE) {
     watchdog('raven', 'Unable to open certificate file.', array(), WATCHDOG_ERROR);
@@ -435,16 +422,16 @@ function raven_form_alter(&$form, $form_state, $form_id) {
   switch ($form_id) {
     case 'user_login':
     case 'user_register_form':
-      if (current_path() !== RAVEN_BACKDOOR_LOGIN_PATH && strncmp(current_path(), 'admin', 5)) {
+      if (current_path() !== 'user/backdoor/login' && strncmp(current_path(), 'admin', 5)) {
         $form['raven_message'] = array(
-          '#markup' => '<div class="messages">' . t('Have a Raven account? You can <a href="@raven_login_path">log in with Raven</a> instead.', array('@raven_login_path' => url(RAVEN_LOGIN_PATH))) . '</div>',
+          '#markup' => '<div class="messages">' . t('Have a Raven account? You can <a href="@raven_login_path">log in with Raven</a> instead.', array('@raven_login_path' => url('raven/login'))) . '</div>',
           '#weight' => -100,
         );
       }
       break;
     case 'user_login_block':
       $form['raven_message'] = array(
-        '#markup' => '<p>' . t('Have a Raven account? You can <a href="@raven_login_path">log in with Raven</a> instead.', array('@raven_login_path' => url(RAVEN_LOGIN_PATH))) . '</p>',
+        '#markup' => '<p>' . t('Have a Raven account? You can <a href="@raven_login_path">log in with Raven</a> instead.', array('@raven_login_path' => url('raven/login'))) . '</p>',
         '#weight' => -100,
       );
       break;
@@ -462,7 +449,7 @@ function raven_block_view_alter(&$data, $block) {
   }
 
   if ($block->delta === 'login' && variable_get('raven_login_override') == TRUE) {
-    $data['content'] = '<ul><li>' . t('<a href="@raven_login_path">Log in with Raven</a>', array('@raven_login_path' => url(RAVEN_LOGIN_PATH))) . '</li></ul>';
+    $data['content'] = '<ul><li>' . t('<a href="@raven_login_path">Log in with Raven</a>', array('@raven_login_path' => url('raven/login'))) . '</li></ul>';
   }
 }
 
