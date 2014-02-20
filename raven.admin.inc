@@ -32,7 +32,7 @@ function raven_settings_form($form, &$form_state) {
       ),
     ),
     '#description' => t('Open a hidden path (\'@raven_backdoor_login_path\') to still allow normal Drupal logins. This mean that site-created users such as \'@user1\' will still be able to log in.<br /><i>Warning: Disabling this without having an administrator able to log in with Raven will lock you out of your site.</i>', array(
-      '@raven_backdoor_login_path' => RAVEN_BACKDOOR_LOGIN_PATH,
+      '@raven_backdoor_login_path' => 'user/backdoor/login',
       // user 1 should always exist, but just in case
       '@user1' => $user1 ? $user1->name : 'admin',
     )),
