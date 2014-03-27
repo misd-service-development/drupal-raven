@@ -149,7 +149,7 @@ function raven_login($redirect = NULL) {
     $redirect = ($_SERVER['HTTP_REFERER'] != NULL ? $_SERVER['HTTP_REFERER'] : $base_url);
   }
 
-  $params['ver'] = '2';
+  $params['ver'] = '3';
   $params['url'] = url('raven/auth', array('absolute' => TRUE));
   $params['desc'] = urlencode(variable_get('raven_website_description', variable_get('site_name', $base_url)));
   $params['params'] = urlencode(url($redirect, array('absolute' => TRUE)));
@@ -174,13 +174,13 @@ function raven_auth() {
   // Parse Raven Reply
   $parts = explode('!', $_REQUEST['WLS-Response']);
 
-  if (count($parts) <> 13) {
+  if (count($parts) <> 14) {
     drupal_set_message(t('Suspicious login attempt denied and logged.'), 'error');
     watchdog('raven', 'Suspicious login attempt. Raven response is not acceptable (@wls_response).', array('@wls_response' => $_REQUEST['WLS-Response']), WATCHDOG_ALERT);
     drupal_goto(variable_get('raven_login_fail_redirect'));
   }
 
-  list($r_ver, $r_status, $r_msg, $r_issue, $r_id, $r_url, $r_principal, $r_auth, $r_sso, $r_life, $r_params, $r_kid, $r_sig) = $parts;
+  list($r_ver, $r_status, $r_msg, $r_issue, $r_id, $r_url, $r_principal, $r_ptags, $r_auth, $r_sso, $r_life, $r_params, $r_kid, $r_sig) = $parts;
 
   $data = implode('!', array(
     $r_ver,
@@ -190,6 +190,7 @@ function raven_auth() {
     $r_id,
     $r_url,
     $r_principal,
+    $r_ptags,
     $r_auth,
     $r_sso,
     $r_life,
@@ -245,6 +246,13 @@ function raven_auth() {
         '@expected' => 'pwd',
         '@given' => $r_sso,
       ), WATCHDOG_ALERT);
+      drupal_goto(variable_get('raven_login_fail_redirect'));
+    }
+
+    // Raven for Life check
+    if ($r_ptags !== 'current' && variable_get('raven_allow_raven_for_life') != TRUE) {
+      drupal_set_message(t('Raven for Life accounts are not allowed to access the site.'), 'error');
+      watchdog('raven', 'Raven for Life account @raven_id denied access.', array('@raven_id' => $r_principal), WATCHDOG_INFO);
       drupal_goto(variable_get('raven_login_fail_redirect'));
     }
 

@@ -46,6 +46,13 @@ function raven_settings_form($form, &$form_state) {
     '#description' => t('Override the Drupal administrator approval settings for users successfully authenticated by Raven.'),
   );
 
+  // Allow Raven for Life accounts to be authenticated
+  $form['raven_allow_raven_for_life'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Allow <a href="@url">Raven for Life accounts</a> to be authenticated', array('@url' => 'http://www.ucs.cam.ac.uk/accounts/ravenleaving')),
+    '#default_value' => variable_get('raven_allow_raven_for_life'),
+  );
+
   // Log users out when closing the browser?
   $form['raven_logout_on_browser_close'] = array(
     '#type' => 'checkbox',
