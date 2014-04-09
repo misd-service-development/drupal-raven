@@ -35,6 +35,7 @@ function raven_install() {
   variable_set('raven_logout_on_browser_close', TRUE);
   variable_set('raven_override_administrator_approval', FALSE);
   variable_set('raven_allow_raven_for_life', FALSE);
+  variable_set('raven_service', 'live');
 }
 
 /**
@@ -49,6 +50,7 @@ function raven_uninstall() {
   variable_del('raven_logout_on_browser_close');
   variable_del('raven_override_administrator_approval');
   variable_del('raven_allow_raven_for_life');
+  variable_del('raven_service');
 
   // Delete authmap entries
   db_delete('authmap')
@@ -65,4 +67,15 @@ function raven_update_7100() {
   }
 
   variable_set('raven_allow_raven_for_life', FALSE);
+}
+
+/**
+ * Set the Raven service variable.
+ */
+function raven_update_7101() {
+  if (NULL !== variable_get('raven_service')) {
+    return;
+  }
+
+  variable_set('raven_service', 'live');
 }

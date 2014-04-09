@@ -53,6 +53,15 @@ function raven_settings_form($form, &$form_state) {
     '#default_value' => variable_get('raven_allow_raven_for_life'),
   );
 
+  // Set which Raven service to use
+  $form['raven_service'] = array(
+    '#type' => 'radios',
+    '#title' => t('Raven service'),
+    '#options' => array('live' => t('Live'), 'demo' => t('Demo')),
+    '#default_value' => variable_get('raven_service'),
+    '#description' => t('The <a href="@url">demo Raven service</a> can be useful for development, especially when not on the University network.<br /><i>Warning: the demo service must not be used in production, otherwise your site will be compromised.</i>', array('@url' => 'https://demo.raven.cam.ac.uk/')),
+  );
+
   // Log users out when closing the browser?
   $form['raven_logout_on_browser_close'] = array(
     '#type' => 'checkbox',
