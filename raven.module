@@ -173,6 +173,10 @@ function raven_login($redirect = NULL) {
  * Failed attempts send the user to the login failure redirect path and logs the problem.
  */
 function raven_auth() {
+  if (FALSE === isset($_REQUEST['WLS-Response'])) {
+    drupal_goto(variable_get('raven_login_fail_redirect'));
+  }
+
   // Parse Raven Reply
   $parts = explode('!', $_REQUEST['WLS-Response']);
 
