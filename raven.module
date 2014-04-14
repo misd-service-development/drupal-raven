@@ -176,30 +176,28 @@ function raven_auth() {
   // Parse Raven Reply
   $parts = explode('!', $_REQUEST['WLS-Response']);
 
-  if (count($parts) <> 14) {
+  $r_ver = array_shift($parts);
+  $versions = array('1' => 12, '2' => 12, '3' => 13);
+
+  if (FALSE === in_array($r_ver, array('1', '2', '3'), TRUE) || count($parts) <> $versions[$r_ver]) {
     drupal_set_message(t('Suspicious login attempt denied and logged.'), 'error');
     watchdog('raven', 'Suspicious login attempt. Raven response is not acceptable (@wls_response).', array('@wls_response' => $_REQUEST['WLS-Response']), WATCHDOG_ALERT);
     drupal_goto(variable_get('raven_login_fail_redirect'));
   }
 
-  list($r_ver, $r_status, $r_msg, $r_issue, $r_id, $r_url, $r_principal, $r_ptags, $r_auth, $r_sso, $r_life, $r_params, $r_kid, $r_sig) = $parts;
+  $r_sig = array_pop($parts);
+  $r_kid = array_pop($parts);
 
-  $data = implode('!', array(
-    $r_ver,
-    $r_status,
-    $r_msg,
-    $r_issue,
-    $r_id,
-    $r_url,
-    $r_principal,
-    $r_ptags,
-    $r_auth,
-    $r_sso,
-    $r_life,
-    $r_params
-  ));
+  if ($r_ver >= 3) {
+    list($r_status, $r_msg, $r_issue, $r_id, $r_url, $r_principal, $r_ptags, $r_auth, $r_sso, $r_life, $r_params) = $parts;
+  }
+  else {
+    list($r_status, $r_msg, $r_issue, $r_id, $r_url, $r_principal, $r_auth, $r_sso, $r_life, $r_params) = $parts;
+  }
 
-  if (($r_status === '200') && (raven_signature_check($data, $r_sig) === TRUE)) {
+  array_unshift($parts, $r_ver);
+
+  if (($r_status === '200') && (raven_signature_check(implode('!', $parts), $r_sig) === TRUE)) {
     // Timeout check
     if ((time() - strtotime($r_issue)) > 30) {
       drupal_set_message(t('Login attempt timed out.'), 'error');
@@ -252,7 +250,7 @@ function raven_auth() {
     }
 
     // Raven for Life check
-    if ($r_ptags !== 'current' && variable_get('raven_allow_raven_for_life') != TRUE) {
+    if (isset($r_ptags) && $r_ptags !== 'current' && variable_get('raven_allow_raven_for_life') != TRUE) {
       drupal_set_message(t('Raven for Life accounts are not allowed to access the site.'), 'error');
       watchdog('raven', 'Raven for Life account @raven_id denied access.', array('@raven_id' => $r_principal), WATCHDOG_INFO);
       drupal_goto(variable_get('raven_login_fail_redirect'));
