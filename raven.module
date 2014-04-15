@@ -318,7 +318,7 @@ function raven_init() {
 
   // prevent normal login pages if needed
   if (variable_get('raven_login_override', FALSE)) {
-    switch (strtolower(request_path())) {
+    switch (strtolower(current_path())) {
       case 'user':
         if (!$user->uid) {
           raven_login('user');
