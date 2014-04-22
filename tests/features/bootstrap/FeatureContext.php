@@ -3,7 +3,9 @@
 namespace Misd\Drupal\RavenModule;
 
 use Behat\Behat\Event\SuiteEvent;
+use Behat\Mink\Driver\BrowserKitDriver;
 use Behat\Mink\Exception\ElementNotFoundException;
+use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\MinkExtension\Context\RawMinkContext;
 use Exception;
@@ -313,5 +315,32 @@ class FeatureContext extends RawMinkContext {
     }
 
     throw new Exception('Message not found');
+  }
+
+  /**
+   * @When /^I restart the browser$/
+   */
+  public function iRestartTheBrowser() {
+    $session = $this->getSession();
+    $driver = $session->getDriver();
+
+    if (FALSE === $driver instanceof BrowserKitDriver) {
+      throw new UnsupportedDriverActionException('Keeping sessions cookies are not supported by %s', $driver);
+    }
+
+    /** @var BrowserKitDriver $driver */
+    $client = $driver->getClient();
+
+    $cookies = $client->getCookieJar()->all();
+
+    $session->restart();
+
+    $session->visit('/');
+
+    foreach ($cookies as $cookie) {
+      if (FALSE === $cookie->isExpired() && NULL !== $cookie->getExpiresTime()) {
+        $client->getCookieJar()->set($cookie);
+      }
+    }
   }
 }
