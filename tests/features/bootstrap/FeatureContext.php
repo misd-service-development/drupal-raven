@@ -182,7 +182,7 @@ class FeatureContext extends RawMinkContext {
    * @Given /^I have a Raven response with an? "([^"]*)" problem$/
    */
   public function iHaveARavenResponseWithAProblem($problem) {
-    $url = rtrim($this->getMinkParameter('base_url'), '/') . '/raven/auth';
+    $url = rtrim($this->getMinkParameter('base_url'), '/') . '/';
 
     if (FALSE === in_array($problem, array('kid', 'url', 'auth', 'sso', 'invalid', 'incomplete', 'expired'))) {
       throw new Exception('Unknown problem');
