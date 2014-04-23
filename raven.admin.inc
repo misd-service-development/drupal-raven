@@ -83,7 +83,7 @@ function raven_settings_form($form, &$form_state) {
   $form['raven_login_fail_redirect'] = array(
     '#type' => 'textfield',
     '#title' => t('Login failure redirect'),
-    '#field_prefix' => $base_url . '/',
+    '#field_prefix' => url(NULL, array('absolute' => TRUE)) . (variable_get('clean_url', FALSE) ? '' : '?q='),
     '#default_value' => variable_get('raven_login_fail_redirect'),
     '#description' => t('If a login fails, they will be redirected to this page.'),
     '#required' => FALSE,

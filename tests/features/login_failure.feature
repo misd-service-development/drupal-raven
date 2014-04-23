@@ -1,12 +1,19 @@
 Feature: Raven failure
 
-  Scenario: Can configure Raven failure redirect path
-    Given the "raven_login_fail_redirect" variable is set to "NULL"
+  Scenario Outline: Can configure Raven failure redirect path
+    Given the "clean_url" variable is set to "<clean url>"
+    And the "raven_login_fail_redirect" variable is set to "NULL"
     And I am logged in as the admin user
-    And I am on "/admin/config/people/raven"
+    And I am on "<config page>"
+    Then I should see the base URL in the "label:contains('Login failure redirect') + .field-prefix" element
     When I fill in "Login failure redirect" with "foo"
     And I press "Save configuration"
     Then the "raven_login_fail_redirect" variable should be "foo"
+
+  Examples:
+    | clean url | config page                  |
+    | TRUE      | /admin/config/people/raven   |
+    | FALSE     | ?q=admin/config/people/raven |
 
   Scenario: Redirects on failure
     Given the "raven_login_fail_redirect" variable is set to "foo"

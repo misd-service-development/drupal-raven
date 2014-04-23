@@ -125,13 +125,13 @@ class FeatureContext extends RawMinkContext {
       $minkContext->visit('/user/logout');
     }
 
-    try {
-      $this->theVariableShouldBe('raven_login_override', 'TRUE');
-      $this->theVariableShouldBe('raven_backdoor_login', 'TRUE');
+    if ($this->isVariable('raven_login_override', TRUE) && $this->isVariable('raven_backdoor_login', TRUE)) {
       $minkContext->visit('/user/backdoor/login');
-    } catch (Exception $e) {
+    }
+    else {
       $minkContext->visit('/user/login');
     }
+
     $minkContext->fillField('Username', 'admin');
     $minkContext->fillField('Password', 'password');
     $minkContext->pressButton('Log in');
@@ -261,25 +261,8 @@ class FeatureContext extends RawMinkContext {
    * @Then /^the "([^"]*)" variable should be "([^"]*)"$/
    */
   public function theVariableShouldBe($variable, $expected) {
-    $expected = maybe_serialize($expected);
-
-    $sth = self::getPdo()->prepare('SELECT * FROM variable WHERE name = :variable LIMIT 1');
-
-    $sth->execute(array(':variable' => $variable));
-
-    $results = $sth->fetch(PDO::FETCH_ASSOC);
-
-    $possible = array($expected);
-
-    if ('b:1;' === $expected) {
-      $possible[] = 'i:1;';
-    }
-    elseif ('b:0;' === $expected) {
-      $possible[] = 'i:0;';
-    }
-
-    if (FALSE === in_array($results['value'], $possible, TRUE)) {
-      throw new Exception(sprintf('The variable is "%s"', $results['value']));
+    if (FALSE === $this->isVariable($variable, $expected)) {
+      throw new Exception(sprintf('The variable is "%s"', $this->getVariable($variable)));
     }
   }
 
@@ -342,5 +325,53 @@ class FeatureContext extends RawMinkContext {
         $client->getCookieJar()->set($cookie);
       }
     }
+  }
+
+  /**
+   * @Then /^I should see the base URL in the "(?P<element>[^"]*)" element$/
+   */
+  public function iShouldSeeTheBaseUrlInTheElement($element) {
+    $text = rtrim($this->getMinkParameter('base_url'), '/') . '/';
+
+    if ($this->isVariable('clean_url', FALSE)) {
+      $text .= '?q=';
+    }
+
+    $element = $this->getMinkContext()->assertSession()->elementExists('css', $element);
+
+    if ($element->getText() !== $text) {
+      throw new Exception('Element text is "' . $element->getText() . '", but expected "' . $text . '"');
+    }
+  }
+
+  protected function getVariable($variable) {
+    $sth = self::getPdo()->prepare('SELECT * FROM variable WHERE name = :variable LIMIT 1');
+
+    $sth->execute(array(':variable' => $variable));
+
+    $results = $sth->fetch(PDO::FETCH_ASSOC);
+
+    return $results['value'];
+  }
+
+  protected function isVariable($variable, $expected) {
+    $expected = maybe_serialize($expected);
+
+    $possible = array($expected);
+
+    if ('b:1;' === $expected) {
+      $possible[] = 'i:1;';
+    }
+    elseif ('i:1;' === $expected) {
+      $possible[] = 'b:1;';
+    }
+    elseif ('b:0;' === $expected) {
+      $possible[] = 'i:0;';
+    }
+    elseif ('i:0;' === $expected) {
+      $possible[] = 'b:0;';
+    }
+
+    return in_array($this->getVariable($variable), $possible, TRUE);
   }
 }
