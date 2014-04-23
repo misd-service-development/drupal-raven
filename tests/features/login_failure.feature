@@ -10,11 +10,17 @@ Feature: Raven failure
 
   Scenario: Redirects on failure
     Given the "raven_login_fail_redirect" variable is set to "foo"
-    When I go to "/raven/auth"
+    When I go to "/?WLS-Response"
     Then I should be on "/foo"
 
   Scenario: Pressing cancel fails gracefully
     Given I am on "/raven/login"
+    When I press "Cancel"
+    Then I should see "Raven authentication cancelled"
+
+  Scenario: Pressing cancel fails gracefully when clean URLs are disabled
+    Given the "clean_url" variable is set to "FALSE"
+    And I am on "/?q=raven/login"
     When I press "Cancel"
     Then I should see "Raven authentication cancelled"
 
