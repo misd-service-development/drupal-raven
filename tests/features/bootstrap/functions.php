@@ -17,6 +17,10 @@ function is_serialized($value) {
   $length = strlen($value);
   $end = '';
 
+  if ($length === 0) {
+    return FALSE;
+  }
+
   switch ($value[0]) {
     case 's':
       if ($value[$length - 2] !== '"') {
