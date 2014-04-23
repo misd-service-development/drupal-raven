@@ -89,5 +89,21 @@ function raven_settings_form($form, &$form_state) {
     '#required' => FALSE,
   );
 
+  $form['#validate'][] = 'raven_settings_validate';
+
   return system_settings_form($form);
+}
+
+/**
+ * Validator for the raven_settings_form() form.
+ */
+function raven_settings_validate($form, &$form_state) {
+  // Get the normal path of login failure redirect.
+  if (!empty($form_state['values']['raven_login_fail_redirect'])) {
+    form_set_value($form['raven_login_fail_redirect'], drupal_get_normal_path($form_state['values']['raven_login_fail_redirect']), $form_state);
+  }
+  // Validate login failure redirect path.
+  if (!empty($form_state['values']['raven_login_fail_redirect']) && !drupal_valid_path($form_state['values']['raven_login_fail_redirect'])) {
+    form_set_error('raven_login_fail_redirect', t("The path '%path' is either invalid or you do not have access to it.", array('%path' => $form_state['values']['raven_login_fail_redirect'])));
+  }
 }

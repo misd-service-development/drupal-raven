@@ -276,6 +276,21 @@ class FeatureContext extends RawMinkContext {
   }
 
   /**
+   * @Given /^the "([^"]*)" path has the alias "([^"]*)"$/
+   */
+  public function thePathHasTheAlias($path, $alias) {
+    $minkContext = $this->getMinkContext();
+
+    $this->iAmLoggedInAsTheAdminUser();
+    $minkContext->visit('/admin/config/search/path/add');
+    $minkContext->fillField('Existing system path', $path);
+    $minkContext->fillField('Path alias', $alias);
+    $minkContext->pressButton('Save');
+
+    $minkContext->assertPageContainsText('The alias has been saved.');
+  }
+
+  /**
    * @Then /^I should see an? "([^"]*)" "([^"]*)" Watchdog message "([^"]*)"$/
    */
   public function iShouldSeeAWatchdogMessage($severity, $type, $message) {
