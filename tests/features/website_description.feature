@@ -10,10 +10,17 @@ Feature: Website description
 
   Scenario: Uses site name when not set
     Given the "site_name" variable is set to "My Site Name"
+    And the "raven_website_description" variable is set to "NULL"
     When I go to "/raven/login"
     Then I should see "My Site Name"
 
-  Scenario: Uses website description when site
+  Scenario: Uses site name when an empty string
+    Given the "site_name" variable is set to "My Site Name"
+    And the "raven_website_description" variable is set to ""
+    When I go to "/raven/login"
+    Then I should see "My Site Name"
+
+  Scenario: Uses website description over site name
     Given the "site_name" variable is set to "My Site Name"
     And the "raven_website_description" variable is set to "Website Description"
     When I go to "/raven/login"
@@ -22,5 +29,11 @@ Feature: Website description
 
   Scenario: Encodes website description
     Given the "raven_website_description" variable is set to "Foo & Bar"
+    When I go to "/raven/login"
+    Then I should see "Foo & Bar"
+
+  Scenario: Encodes site name
+    Given the "site_name" variable is set to "Foo & Bar"
+    And the "raven_website_description" variable is set to "NULL"
     When I go to "/raven/login"
     Then I should see "Foo & Bar"
