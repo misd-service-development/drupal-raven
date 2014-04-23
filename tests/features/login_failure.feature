@@ -6,14 +6,31 @@ Feature: Raven failure
     And I am logged in as the admin user
     And I am on "<config page>"
     Then I should see the base URL in the "label:contains('Login failure redirect') + .field-prefix" element
-    When I fill in "Login failure redirect" with "foo"
+    When I fill in "Login failure redirect" with "node"
     And I press "Save configuration"
-    Then the "raven_login_fail_redirect" variable should be "foo"
+    Then the "raven_login_fail_redirect" variable should be "node"
 
   Examples:
     | clean url | config page                  |
     | TRUE      | /admin/config/people/raven   |
     | FALSE     | ?q=admin/config/people/raven |
+
+  Scenario: Raven failure redirect path has to be valid
+    Given I am logged in as the admin user
+    And I am on "/admin/config/people/raven"
+    When I fill in "Login failure redirect" with "foo"
+    And I press "Save configuration"
+    Then I should see "The path 'foo' is either invalid or you do not have access to it."
+
+  Scenario: Raven failure redirect path stores unaliased path
+    Given the "path" module is enabled
+    And the "node" path has the alias "foo"
+    And I am logged in as the admin user
+    And I am on "/admin/config/people/raven"
+    When I fill in "Login failure redirect" with "foo"
+    And I press "Save configuration"
+    Then the "raven_login_fail_redirect" variable should be "node"
+    And the "Login failure redirect" field should contain "node"
 
   Scenario: Redirects on failure
     Given the "raven_login_fail_redirect" variable is set to "foo"
