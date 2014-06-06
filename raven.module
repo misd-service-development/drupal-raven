@@ -144,17 +144,11 @@ function raven_login($redirect = NULL) {
   $website_description = variable_get('raven_website_description');
 
   $params['ver'] = '3';
-  $params['url'] = urlencode($base_url . '/');
-  $params['desc'] = urlencode(!empty($website_description) ? $website_description : variable_get('site_name', $base_url));
-  $params['params'] = urlencode(url($redirect, array('absolute' => TRUE)));
+  $params['url'] = $base_url . '/';
+  $params['desc'] = !empty($website_description) ? $website_description : variable_get('site_name', $base_url);
+  $params['params'] = url($redirect, array('absolute' => TRUE));
 
-  $parameters = array();
-  foreach ($params as $key => $val) {
-    $parameters[] = $key . '=' . utf8_encode($val);
-  }
-  $parameters = implode('&', $parameters);
-
-  drupal_goto(get_raven_url() . '?' . $parameters, array(), 303);
+  drupal_goto(get_raven_url(), array('query' => $params), 303);
 }
 
 /**
