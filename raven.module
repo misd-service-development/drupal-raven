@@ -528,7 +528,7 @@ function user_raven_login_register($name) {
       drupal_alter('raven_register', $edit, $account);
       watchdog('raven', 'New user: @name (@email).', array(
         '@name' => $edit['name'],
-        '@email' => $edit['init'],
+        '@email' => $edit['mail'],
         WATCHDOG_NOTICE,
         l(t('edit'), 'user/' . $account->uid . '/edit')
       ));
