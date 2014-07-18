@@ -89,6 +89,15 @@ function raven_settings_form($form, &$form_state) {
     '#required' => FALSE,
   );
 
+  // Let the user override the standard login pages (user, user/login, ?q=user, ?q=user/login)
+  $form['raven_use_request_uri'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Redirect successful logins to $_SERVER[\'REQUEST_URI\']'),
+    '#default_value' => variable_get('raven_use_request_uri'),
+    '#description' => t('Preferentially redirect successful logins to the requested URI. This lets you set the site\'s 403 page at admin/system/site-information to raven/login.'),
+  );
+
+
   $form['#validate'][] = 'raven_settings_validate';
 
   return system_settings_form($form);
