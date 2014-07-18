@@ -18,7 +18,7 @@ function raven_help($path, $arg) {
       $output .= '<h3>' . t('About') . '</h3>';
       $output .= '<p>' . t('The Raven authentication module allows users to log in using <a href="@raven_url">Raven</a>, the University of Cambridge\'s central web authentication service. It can replace, or co-exist with, the standard Drupal authentication method.', array('@raven_url' => 'http://raven.cam.ac.uk/')) . '</p>';
 
-      $output .= '<h3>' . t('Uses') . '</h3>';
+      $output .= '<h3>' . t('Users') . '</h3>';
       $output .= '<dl>';
 
       $output .= '<dt>' . t('Creating Raven users') . '</dt>';
