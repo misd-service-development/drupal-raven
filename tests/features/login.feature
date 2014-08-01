@@ -28,6 +28,20 @@ Feature: Login message
     And I press "Submit"
     Then I should be on "/user"
 
+  Scenario: After Raven login redirects to destination page
+    When I go to "/raven/login?destination=foo"
+    And I fill in "User-id" with "test0001"
+    And I fill in "Password" with "test"
+    And I press "Submit"
+    Then I should be on "/foo"
+
+  Scenario: After Raven login redirects to the homepage when the destination page is not a relative URL
+    When I go to "/raven/login?destination=http://www.cam.ac.uk/"
+    And I fill in "User-id" with "test0001"
+    And I fill in "Password" with "test"
+    And I press "Submit"
+    Then I should be on the homepage
+
   Scenario: Raven login available when in maintenance mode
     Given the "maintenance_mode" variable is set to "TRUE"
     And the "authenticated user" role has the "system" "access site in maintenance mode" permission
