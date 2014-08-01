@@ -156,6 +156,9 @@ function raven_login($redirect = NULL) {
   $params['desc'] = !empty($website_description) ? $website_description : variable_get('site_name', $base_url);
   $params['params'] = url($redirect, array('absolute' => TRUE));
 
+  // Remove any messages (such as 'You need to log in') to stop them appearing on the next page.
+  drupal_get_messages();
+
   unset($_GET['destination']);
   drupal_goto(get_raven_url(), array('query' => $params), 303);
 }
@@ -507,6 +510,7 @@ function user_raven_login_register($name) {
         switch (variable_get('user_register')) {
           case USER_REGISTER_ADMINISTRATORS_ONLY:
             drupal_set_message(t('Only site administrators can create accounts.'), 'error');
+            unset($_GET['destination']);
             drupal_goto(variable_get('raven_login_fail_redirect'));
             break;
           case USER_REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL:
@@ -573,7 +577,8 @@ function user_raven_login_register($name) {
 
   global $user;
 
-  if (!$user->uid) {
+  if (!$user->uid || $user->status == 0) {
+    unset($_GET['destination']);
     drupal_goto(variable_get('raven_login_fail_redirect'));
   }
 }
