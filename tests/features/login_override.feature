@@ -141,6 +141,14 @@ Feature: Login override
     When I follow "Log in with Raven"
     Then I should be on "https://demo.raven.cam.ac.uk/auth/authenticate.html"
 
+  Scenario: User login block does not appear on backdoor
+    Given the "block" module is enabled
+    And the "raven_login_override" variable is set to "TRUE"
+    And the "raven_backdoor_login" variable is set to "TRUE"
+    And the "user" "login" block is in the "sidebar_first" region
+    When I go to "/user/backdoor/login"
+    Then I should not see a "#block-user-login" element
+
   Scenario: Compatible with r4032login module when can't create an account
     Given the "r4032login" module is enabled
     And the "raven_login_override" variable is set to "TRUE"
