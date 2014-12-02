@@ -8,3 +8,4 @@ configure = admin/config/people/raven
 dependencies[] = user
 
 files[] = raven.module
+files[] = raven.rules.inc
