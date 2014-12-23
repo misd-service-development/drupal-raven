@@ -461,6 +461,19 @@ function raven_block_view_alter(&$data, $block) {
 }
 
 /**
+ * Implements hook_block_list_alter().
+ */
+function raven_block_list_alter(&$blocks) {
+  if(raven_backdoor_login_is_enabled() === TRUE && current_path() === 'user/backdoor/login') {
+    foreach($blocks as $key => $block) {
+      if($block->module === 'user' && $block->delta === 'login') {
+        unset($blocks[$key]);
+      }
+    }
+  }
+}
+
+/**
  * Is this a Raven user?
  *
  * @param StdClass $account
