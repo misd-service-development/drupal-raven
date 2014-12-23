@@ -51,6 +51,18 @@ Feature: Login override
     | /usEr/register |
     | /usEr/login    |
 
+  Scenario: Doesn't double-language-prefix a path when using destination
+    Given the "raven_login_override" variable is set to "TRUE"
+    And the "user_register" variable is set to "1"
+    And the "i18n" module is enabled
+    And Spanish is enabled
+    When I go to "/es/user/login?destination=es/admin"
+    Then I should be on "https://demo.raven.cam.ac.uk/auth/authenticate.html"
+    And I fill in "User-id" with "test0001"
+    And I fill in "Password" with "test"
+    And I press "Submit"
+    Then I should be on "/es/admin"
+
   Scenario Outline: Overrides user pages when in maintenance mode
     Given the "maintenance_mode" variable is set to "TRUE"
     And the "raven_login_override" variable is set to "TRUE"
