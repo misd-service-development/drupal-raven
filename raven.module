@@ -309,6 +309,17 @@ function raven_response_status_name($code) {
 }
 
 /**
+ * Implements hook_url_outbound_alter().
+ */
+function raven_url_outbound_alter(&$path, &$options, $original_path) {
+  if (variable_get('raven_login_override', FALSE)) {
+    if ('user/login' === $path) {
+      $path = 'raven/login';
+    }
+  }
+}
+
+/**
  * Implements hook_init().
  */
 function raven_init() {

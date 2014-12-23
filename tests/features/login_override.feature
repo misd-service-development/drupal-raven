@@ -161,6 +161,19 @@ Feature: Login override
     When I go to "/user/backdoor/login"
     Then I should not see a "#block-user-login" element
 
+  Scenario: Alters URL
+    Given the "menu" module is enabled
+    And the "raven_login_override" variable is set to "TRUE"
+    And I am logged in as the admin user
+    When I go to "/admin/structure/menu/manage/main-menu/add"
+    And I fill in "Menu link title" with "Log in"
+    And I fill in "Path" with "user/login"
+    And I press "Save"
+    And I follow "Log out"
+    And I go to "/"
+    Then I should see a "a[href^='/raven/login']:contains('Log in')" element
+    And I should not see a "a[href^='/user/login']:contains('Log in')" element
+
   Scenario: Compatible with r4032login module when can't create an account
     Given the "r4032login" module is enabled
     And the "raven_login_override" variable is set to "TRUE"
