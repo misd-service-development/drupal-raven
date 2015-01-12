@@ -585,7 +585,7 @@ function user_raven_login_register($name) {
   if (FALSE === $account) {
     drupal_set_message(t('Error saving user account.'), 'error');
   }
-  elseif (user_is_blocked($account->name)) {
+  elseif (FALSE === isset($status) && user_is_blocked($account->name)) {
     drupal_set_message(t('The username @name is blocked.', array('@name' => $account->name)), 'error');
   }
   else {
