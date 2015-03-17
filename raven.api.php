@@ -65,5 +65,18 @@ function hook_raven_login_alter(&$edit, $account) {
 }
 
 /**
+ * Allow modules to execute custom code after a user logs in with Raven.
+ *
+ * This is called after a user has logged in using Raven.
+ *
+ * @param StdClass $account
+ *   User account.
+ */
+function hook_raven_post_login($account) {
+  // Display a custom message
+  drupal_set_message(t('Welcome to our website, @name', array('@name' => $account->name)));
+}
+
+/**
  * @} End of "addtogroup hooks".
  */
