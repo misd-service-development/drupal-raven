@@ -594,6 +594,7 @@ function user_raven_login_register($name) {
     // Log user in
     $form_state['uid'] = $account->uid;
     user_login_submit(array(), $form_state);
+    module_invoke_all('raven_post_login', $account);
   }
 
   global $user;
