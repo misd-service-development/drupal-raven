@@ -368,7 +368,7 @@ function raven_init() {
  */
 function raven_signature_check($data, $sig) {
   $key = openssl_pkey_get_public(get_raven_pubkey());
-  $result = openssl_verify(rawurldecode($data), raven_signature_decode(rawurldecode($sig)), $key);
+  $result = openssl_verify($data, raven_signature_decode($sig), $key);
   openssl_free_key($key);
   switch ($result) {
     case 1:
