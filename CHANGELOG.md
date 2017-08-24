@@ -1,6 +1,13 @@
 Changelog
 =========
 
+7.x-1.4
+-------
+
+24 August 2017.
+
+* Ensure that the path that will ultimately be passed to drupal_encode_path() is not URI-encoded (Pull request #49).
+
 7.x-1.3
 -------
 
