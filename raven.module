@@ -142,7 +142,7 @@ function raven_login($redirect = NULL) {
       $redirect = $_GET['destination'];
     }
     elseif (NULL != $_SERVER['HTTP_REFERER']) {
-      $redirect = $_SERVER['HTTP_REFERER'];
+      $redirect = rawurldecode($_SERVER['HTTP_REFERER']);
     }
     else {
       $redirect = $base_url . '/';
