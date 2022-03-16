@@ -261,6 +261,14 @@ function raven_auth() {
       drupal_goto(variable_get('raven_login_fail_redirect'));
     }
 
+    // Check destination is internal
+    if (url_is_external($r_params) && parse_url($base_url, PHP_URL_HOST) !== parse_url($r_params, PHP_URL_HOST)) {
+      drupal_set_message(t('The login destination is external to this website, so we could not redirect you.'), 'error');
+      watchdog('raven', 'Redirect destination was external. The user was not redirected to @destination.', array('@destination' => $r_params), WATCHDOG_ERROR);
+      // Proceed with the login, but don't redirect to the external website.
+      $r_params = $base_url . '/';
+    }
+
     // Successful login
     user_raven_login_register($r_principal);
     drupal_goto(urldecode($r_params));
