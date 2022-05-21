@@ -418,6 +418,66 @@ function raven_signature_decode($str) {
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter() for user_register_form().
+ */
+function raven_form_user_register_form_alter(&$form, &$form_state, $form_id) {
+  if (user_access('administer users') === FALSE) {
+    return;
+  }
+
+  $form['account']['raven_only'] = array(
+    '#type' => 'radios',
+    '#title' => 'Raven-only user',
+    '#default_value' => variable_get('raven_login_override'),
+    '#options' => array(
+      0 => 'No',
+      1 => 'Yes',
+    ),
+    '#access' => 1,
+    '#weight' => $form['account']['name']['#weight'] - 1,
+  );
+
+  // We have to wrap the password in a container to be able to hide it (see https://drupal.org/node/1427838)
+  $firstArray = array_splice($form['account'], 0, array_search('pass', array_keys($form['account'])));
+  $form['account'] = array_merge($firstArray, array(
+    'pass_wrapper' => array(
+      '#type' => 'container',
+      '#states' => array(
+        'visible' => array(
+          ':input[name="raven_only"]' => array('value' => 0),
+        ),
+      ),
+      'pass' => $form['account']['pass'],
+    )
+  ), $form['account']);
+  unset($form['account']['pass']);
+
+  // Password isn't required if Raven-only is selected
+  $form['account']['pass_wrapper']['pass']['#required'] = isset($form_state['input']['raven_only']) ? $form_state['input']['raven_only'] == 0 : TRUE;
+
+  array_unshift($form['#submit'], 'raven_user_register_submit_empty_password');
+  $form['#submit'][] = 'raven_user_register_submit_authmap';
+}
+
+/**
+ * Submit handler for the user_register_form which adds a random password if it's empty.
+ */
+function raven_user_register_submit_empty_password($form, &$form_state) {
+  if ($form_state['values']['pass'] === '') {
+    $form_state['values']['pass'] = user_password();
+  }
+}
+
+/**
+ * Submit handler for the user_register_form which adds an authmap entry for Raven-only users.
+ */
+function raven_user_register_submit_authmap($form, &$form_state) {
+  if ($form_state['values']['raven_only'] == 1) {
+    user_set_authmaps($form_state['user'], array('authname_raven' => $form_state['values']['name']));
+  }
+}
+
+/**
  * Implements hook_form_FORM_ID_alter() for user_profile_form().
  *
  * Changes the user profile from for Raven users (eg the username field is labelled as CRSid).
