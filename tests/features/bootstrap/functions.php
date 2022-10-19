@@ -182,7 +182,9 @@ Y6iyl0/GyBRzAXYemQJAVeChw15Lj2/uE7HIDtkqd8POzXjumOxKPfESSHKxRGnP
 
   openssl_sign($data, $signature, $pkeyid);
 
-  openssl_free_key($pkeyid);
+  if (version_compare(PHP_VERSION, '8.0.0', '<')) {
+    openssl_free_key($pkeyid);
+  }
 
   $signature =
     preg_replace(
